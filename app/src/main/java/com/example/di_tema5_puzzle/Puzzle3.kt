@@ -30,8 +30,25 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 
-//
-// Puzzle con cabezas y agujeros (piezas estilo "jigsaw")
+data class PieceShape(
+    val top: Boolean = false,
+    val right: Boolean = false,
+    val bottom: Boolean = false,
+    val left: Boolean = false,
+)
+
+// Mapa de piezas para tablero 2x2
+val pieceMap: List<PieceShape> = listOf(
+    // Fila 0, Columna 0
+    PieceShape(top = false, right = true, bottom = true, left = false),
+    // Fila 0, Columna 1
+    PieceShape(top = false, right = false, bottom = true, left = true),
+    // Fila 1, Columna 0
+    PieceShape(top = true, right = true, bottom = false, left = false),
+    // Fila 1, Columna 1
+    PieceShape(top = true, right = false, bottom = false, left = true)
+)
+// Igual que puzzle 2 pero sin los datos hardcodeados
 @Composable
 fun Puzzle3(modifier: Modifier = Modifier) {
 
@@ -89,6 +106,7 @@ fun Piezas3(modifier: Modifier = Modifier, indice: Int) {
     var OffsetX by remember { mutableStateOf(0.dp) } // Posición X de la pieza
     var OffsetY by remember { mutableStateOf(0.dp) } // Posición Y de la pieza
     var density = LocalDensity.current               // Para convertir px a dp
+    val shape = pieceMap[indice]
 
     // Llamamos a la forma custom para dibujarla
     FormaPieza2(
@@ -103,10 +121,10 @@ fun Piezas3(modifier: Modifier = Modifier, indice: Int) {
                 }
             },
         color = ColorPiezas3(indice),         // Color según índice
-        top = indice == 0,                    // Si la pieza tiene cabeza arriba
-        right = indice == 1,                  // Si tiene cabeza derecha
-        bottom = indice == 2,                 // Cabeza abajo
-        left = indice == 3                    // Cabeza izquierda
+        top = shape.top,                    // Si la pieza tiene cabeza arriba
+        right = shape.right,                  // Si tiene cabeza derecha
+        bottom = shape.bottom,                 // Cabeza abajo
+        left = shape.left                    // Cabeza izquierda
     )
 }
 
