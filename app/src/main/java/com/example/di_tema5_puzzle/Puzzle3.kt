@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 
 // Puzzle con cabezas y agujeros
 @Composable
-fun Puzzle2(modifier: Modifier = Modifier) {
+fun Puzzle3(modifier: Modifier = Modifier) {
 
     var lista = listOf(0,1,2,3).shuffled()
 
@@ -73,7 +73,7 @@ fun Puzzle2(modifier: Modifier = Modifier) {
             ) {
                 // Dibujamos las piezas
                 lista.forEach() {elemento ->
-                    Piezas2(modifier, elemento)
+                    Piezas3(modifier, elemento)
                 }
 
             }
@@ -83,12 +83,12 @@ fun Puzzle2(modifier: Modifier = Modifier) {
 
 @Composable
 // dibuja las piezas
-fun Piezas2(modifier: Modifier = Modifier, indice: Int) {
+fun Piezas3(modifier: Modifier = Modifier, indice: Int) {
     var OffsetX by remember { mutableStateOf(0.dp) }
     var OffsetY by remember { mutableStateOf(0.dp) }
     var density = LocalDensity.current
 
-    FormaPieza(modifier
+    FormaPieza2(modifier
         .offset(x = OffsetX, y = OffsetY)
         .size(100.dp)
         .pointerInput(Unit) {
@@ -98,17 +98,17 @@ fun Piezas2(modifier: Modifier = Modifier, indice: Int) {
                 OffsetY += with(density) { dragAmount.y.toDp() }
             }
         },
-        color = ColorPiezas2(indice),
+        color = ColorPiezas3(indice),
         top = indice == 0,
         right = indice == 1,
         bottom = indice == 2,
         left = indice == 3
-        )
+    )
 }
 
 @Composable
 // da color a las piezas
-fun ColorPiezas2(indice: Int): Color {
+fun ColorPiezas3(indice: Int): Color {
     if (indice == 0) {
         return Color.Cyan
     } else if (indice == 1) {
@@ -123,7 +123,7 @@ fun ColorPiezas2(indice: Int): Color {
 }
 
 @Composable
-fun FormaPieza(modifier: Modifier = Modifier, color:Color, top: Boolean, bottom: Boolean, right: Boolean, left:Boolean) {
+fun FormaPieza2(modifier: Modifier = Modifier, color:Color, top: Boolean, bottom: Boolean, right: Boolean, left:Boolean) {
 
     Canvas(modifier) {
         val w = size.width
