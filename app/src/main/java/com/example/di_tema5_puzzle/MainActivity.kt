@@ -21,7 +21,8 @@ class MainActivity : ComponentActivity() {
             DI_Tema5_PuzzleTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     //Puzzle1(modifier = Modifier.padding(innerPadding))
-                    Puzzle2(modifier = Modifier.padding(innerPadding))
+                    //Puzzle2(modifier = Modifier.padding(innerPadding))
+                    Puzzle3(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
