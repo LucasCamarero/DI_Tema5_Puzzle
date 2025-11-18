@@ -31,6 +31,9 @@ import androidx.compose.ui.zIndex
 
 @Composable
 fun Puzzle1(modifier: Modifier = Modifier) {
+
+    var lista = listOf(0,1,2,3).shuffled()
+
     LazyColumn(
         modifier
             .fillMaxSize(),
@@ -68,8 +71,8 @@ fun Puzzle1(modifier: Modifier = Modifier) {
                     .fillMaxWidth()
             ) {
                 // Dibujamos las piezas
-                for (i in 0..3) {
-                    Piezas(modifier, i)
+                lista.forEach() {elemento ->
+                    Piezas(modifier, elemento)
                 }
 
             }
