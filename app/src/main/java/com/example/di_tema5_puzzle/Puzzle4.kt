@@ -29,7 +29,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 
-data class PieceShape(
+data class PieceShape10(
     val top: Boolean = false,
     val right: Boolean = false,
     val bottom: Boolean = false,
@@ -37,20 +37,19 @@ data class PieceShape(
 )
 
 // Mapa de piezas para tablero 2x2
-val pieceMap: List<PieceShape> = listOf(
+val pieceMap2: List<PieceShape10> = listOf(
     // Fila 0, Columna 0
-    PieceShape(top = false, right = true, bottom = true, left = false),
+    PieceShape10(top = false, right = true, bottom = true, left = false),
     // Fila 0, Columna 1
-    PieceShape(top = false, right = false, bottom = true, left = true),
+    PieceShape10(top = false, right = false, bottom = true, left = true),
     // Fila 1, Columna 0
-    PieceShape(top = true, right = true, bottom = false, left = false),
+    PieceShape10(top = true, right = true, bottom = false, left = false),
     // Fila 1, Columna 1
-    PieceShape(top = true, right = false, bottom = false, left = true)
+    PieceShape10(top = true, right = false, bottom = false, left = true)
 )
-// Igual que puzzle 2 pero sin los datos hardcodeados
+// Igual que puzzle 3 pero con cabezas y huecos
 @Composable
-fun Puzzle3(modifier: Modifier = Modifier) {
-
+fun Puzzle4(modifier: Modifier = Modifier) {
     var lista = listOf(0,1,2,3).shuffled() // Mezclamos los índices de las piezas
 
     LazyColumn(
@@ -90,7 +89,7 @@ fun Puzzle3(modifier: Modifier = Modifier) {
             ) {
                 // Dibujamos las piezas
                 lista.forEach() { elemento -> // Recorremos cada índice desordenado
-                    Piezas3(modifier, elemento) // Dibujamos pieza según su índice
+                    Piezas10(modifier, elemento) // Dibujamos pieza según su índice
                 }
 
             }
@@ -100,36 +99,37 @@ fun Puzzle3(modifier: Modifier = Modifier) {
 
 @Composable
 // Dibuja una pieza con forma (incluyendo cabezas/lados)
-fun Piezas3(modifier: Modifier = Modifier, indice: Int) {
+fun Piezas10(modifier: Modifier = Modifier, indice: Int) {
 
-    var OffsetX by remember { mutableStateOf(0.dp) } // Posición X de la pieza
-    var OffsetY by remember { mutableStateOf(0.dp) } // Posición Y de la pieza
-    var density = LocalDensity.current               // Para convertir px a dp
-    val shape = pieceMap[indice]
+    val density = LocalDensity.current
+    var offsetX by remember { mutableStateOf(0.dp) }
+    var offsetY by remember { mutableStateOf(0.dp) }
+    val color = ColorPiezas3(indice)
 
-    // Llamamos a la forma custom para dibujarla
-    FormaPieza2(
-        modifier
-            .offset(x = OffsetX, y = OffsetY) // Posición movida por drag
-            .size(100.dp)                     // Tamaño de la pieza
-            .pointerInput(Unit) {             // Detecta arrastre
+    val shape = pieceMap2[indice]
+
+    FormaPieza10(
+        modifier = Modifier
+            .offset(x = offsetX, y = offsetY)
+            .size(100.dp)
+            .pointerInput(Unit) {
                 detectDragGestures { change, dragAmount ->
-                    change.consume()          // Consumimos el evento
-                    OffsetX += with(density) { dragAmount.x.toDp() } // Mover X
-                    OffsetY += with(density) { dragAmount.y.toDp() } // Mover Y
+                    change.consume()
+                    offsetX += with(density) { dragAmount.x.toDp() }
+                    offsetY += with(density) { dragAmount.y.toDp() }
                 }
             },
-        color = ColorPiezas3(indice),         // Color según índice
-        top = shape.top,                    // Si la pieza tiene cabeza arriba
-        right = shape.right,                  // Si tiene cabeza derecha
-        bottom = shape.bottom,                 // Cabeza abajo
-        left = shape.left                    // Cabeza izquierda
+        color = color,
+        topHead = shape.top,   // cabeza arriba
+        rightHole = shape.right, // agujero a la derecha
+        bottomHead = shape.bottom,
+        leftHole = shape.left
     )
 }
 
 @Composable
 // Devuelve un color según el índice de la pieza
-fun ColorPiezas3(indice: Int): Color {
+fun ColorPiezas10(indice: Int): Color {
     if (indice == 0) {
         return Color.Cyan      // Pieza 0 → cian
     } else if (indice == 1) {
@@ -145,79 +145,81 @@ fun ColorPiezas3(indice: Int): Color {
 
 @Composable
 // Dibuja la forma de la pieza de puzzle usando Canvas y Path
-fun FormaPieza2(
+fun FormaPieza10(
     modifier: Modifier = Modifier,
     color: Color,
-    top: Boolean,
-    bottom: Boolean,
-    right: Boolean,
-    left:Boolean
+    topHead: Boolean = false,
+    topHole: Boolean = false,
+    rightHead: Boolean = false,
+    rightHole: Boolean = false,
+    bottomHead: Boolean = false,
+    bottomHole: Boolean = false,
+    leftHead: Boolean = false,
+    leftHole: Boolean = false
 ) {
+    Canvas(modifier = modifier) {
+        val w = size.width
+        val h = size.height
+        val knobSize = w * 0.2f
 
-    Canvas(modifier) {                         // Componente para dibujar
-        val w = size.width                     // Ancho del canvas
-        val h = size.height                    // Alto del canvas
-        val knobSize = w * 0.2f                // Tamaño de la "cabeza" de la pieza
-
-        val path = Path().apply {              // Ruta que define la forma
-
-            moveTo(0f, 0f)                     // Empezamos en la esquina superior izquierda
+        val path = Path().apply {
+            moveTo(0f, 0f)
 
             // borde superior
-            if (top) {                         // Si tiene cabeza arriba
-                lineTo(w * 0.4f, 0f)           // Comienzo del arco
-                cubicTo(                       // Curva hacia afuera
-                    w * 0.45f, -knobSize,
-                    w * 0.55f, -knobSize,
-                    w * 0.6f, 0f
-                )
-                lineTo(w, 0f)                  // Fin del borde superior
+            if (topHead) {
+                lineTo(w * 0.4f, 0f)
+                cubicTo(w * 0.45f, -knobSize, w * 0.55f, -knobSize, w * 0.6f, 0f)
+                lineTo(w, 0f)
+            } else if (topHole) {
+                lineTo(w * 0.4f, 0f)
+                cubicTo(w * 0.45f, +knobSize, w * 0.55f, +knobSize, w * 0.6f, 0f)
+                lineTo(w, 0f)
             } else {
-                lineTo(w, 0f)                  // Borde recto
+                lineTo(w, 0f)
             }
 
             // borde derecho
-            if (right) {                       // Cabeza derecha
+            if (rightHead) {
                 lineTo(w, h * 0.4f)
-                cubicTo(
-                    w + knobSize, h * 0.45f,
-                    w + knobSize, h * 0.55f,
-                    w, h * 0.6f
-                )
+                cubicTo(w + knobSize, h * 0.45f, w + knobSize, h * 0.55f, w, h * 0.6f)
+                lineTo(w, h)
+            } else if (rightHole) {
+                lineTo(w, h * 0.4f)
+                cubicTo(w - knobSize, h * 0.45f, w - knobSize, h * 0.55f, w, h * 0.6f)
                 lineTo(w, h)
             } else {
                 lineTo(w, h)
             }
 
             // borde inferior
-            if (bottom) {                      // Cabeza inferior
+            if (bottomHead) {
                 lineTo(w * 0.6f, h)
-                cubicTo(
-                    w * 0.55f, h + knobSize,
-                    w * 0.45f, h + knobSize,
-                    w * 0.4f, h
-                )
+                cubicTo(w * 0.55f, h + knobSize, w * 0.45f, h + knobSize, w * 0.4f, h)
+                lineTo(0f, h)
+            } else if (bottomHole) {
+                lineTo(w * 0.6f, h)
+                cubicTo(w * 0.55f, h - knobSize, w * 0.45f, h - knobSize, w * 0.4f, h)
                 lineTo(0f, h)
             } else {
                 lineTo(0f, h)
             }
 
             // borde izquierdo
-            if (left) {                        // Cabeza izquierda
+            if (leftHead) {
                 lineTo(0f, h * 0.6f)
-                cubicTo(
-                    -knobSize, h * 0.55f,
-                    -knobSize, h * 0.45f,
-                    0f, h * 0.4f
-                )
+                cubicTo(-knobSize, h * 0.55f, -knobSize, h * 0.45f, 0f, h * 0.4f)
+                lineTo(0f, 0f)
+            } else if (leftHole) {
+                lineTo(0f, h * 0.6f)
+                cubicTo(+knobSize, h * 0.55f, +knobSize, h * 0.45f, 0f, h * 0.4f)
                 lineTo(0f, 0f)
             } else {
                 lineTo(0f, 0f)
             }
 
-            close()                            // Cerramos la figura
+            close()
         }
 
-        drawPath(path, color)                  // Dibujamos la forma con el color
+        drawPath(path, color)
     }
 }
